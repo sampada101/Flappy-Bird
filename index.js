@@ -36,10 +36,34 @@ pipe[0] = {
     x : cvs.width,
     y : 0
 };
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  var expires = "expires="+d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
 
+function getCookie(cname) {
+  var name = cname + "=";
+  var ca = document.cookie.split(';');
+  for(var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return 0;
+}
 
 function draw(){
-    
+    var prevHigh = getCookie('highscore')
+    if (prevHigh == 0){
+        setCookie('highscore', 0, 10)
+    }
+    highscore = getCookie('highscore')
     ctx.drawImage(bg,0,0);
     
     
@@ -59,8 +83,15 @@ function draw(){
         }
         
         if( bX + bird.width >= pipe[i].x && bX <= pipe[i].x + pipeNorth.width && (bY <= pipe[i].y + pipeNorth.height || bY+bird.height >= pipe[i].y+constant) || bY + bird.height >=  cvs.height - fg.height){
-            alert(`Your score is ${score}`)
-            location.assign('https://sampada101.github.io/Flappy-Bird/reload.html');
+            
+            if (score > highscore){
+                console.log(score > highscore)
+                setCookie('highscore', score, 10)
+            }
+            highscore = getCookie('highscore')
+            alert(`You current score is ${score} and highscore is ${highscore}`)
+            location.reload()
+            cancelAnimationFrame(req)
         }
         
         if(pipe[i].x == 5){
